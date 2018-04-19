@@ -16,9 +16,11 @@ DigitalOut led3(LED3, 1); //LED B OFF
 #define CAN_DEV_ID              0x1AC
 
 #if defined(TARGET_NUMAKER_PFM_NUC472)
-CAN canObj(PA_0, PA_1);
+CAN canObj(PA_0, PA_1);     // Internal in the board
 #elif defined(TARGET_NUMAKER_PFM_M453)
-CAN canObj(PA_13,PA_12);
+CAN canObj(PA_13, PA_12);   // Internal in the board
+#elif defined(TARGET_NUMAKER_PFM_M487)
+CAN canObj(D9, D8);         // Change to match external attachment
 #endif
 
 CANMessage canMsg;
