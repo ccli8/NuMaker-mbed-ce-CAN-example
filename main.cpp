@@ -9,7 +9,8 @@ DigitalOut led3(LED3, 1); //LED B OFF
 
 #define CAN_TX_MODE_TEST            0
 #define CAN_RX_MODE_TEST            1
-#define CAN_RX_IRQ_EN               1
+/* WARNING: Don't enable interrupt mode on receive side. It is not supported on Nuvoton targets. */
+#define CAN_RX_IRQ_EN               0
 #define LED_ALL_OFF                 led1=led2=led3=1
 
 #define MSG_NUM_INDEX           5   // 0 ~ 31   
@@ -21,6 +22,8 @@ CAN canObj(PA_0, PA_1);     // Internal in the board
 CAN canObj(PA_13, PA_12);   // Internal in the board
 #elif defined(TARGET_NUMAKER_PFM_M487)
 CAN canObj(D9, D8);         // Change to match external attachment
+#elif defined(TARGET_NUMAKER_IOT_M487) 
+CAN canObj(A0, A1);         // Change to match external attachment
 #endif
 
 CANMessage canMsg;
@@ -60,11 +63,19 @@ int i=0;
 
 void irq_callback(void)
 {
-    if(read_MsgObj() )
-        osSignalSet(mainThreadID, 0x06);
+    /* Wake up receive task */
+    osSignalSet(mainThreadID, 0x06);
 }
 
 int main() {
+#if CAN_TX_MODE_TEST
+    printf("CAN sender sample\r\n");
+#endif
+
+#if CAN_RX_MODE_TEST
+    printf("CAN receiver sample\r\n");
+#endif
+
     int i=0;
     char data[8]={0};
 
@@ -103,14 +114,15 @@ int main() {
 #endif
         
 #if CAN_RX_MODE_TEST
-        
-#if (CAN_RX_IRQ_EN)        // interrupt mode
+
+#if (CAN_RX_IRQ_EN)
         /* Wait for receive task to wakeup */
-    osSignalWait(0x06, osWaitForever);      
-#else                                           // pooling mode
-        if( !read_MsgObj() ) continue;
+        osSignalWait(0x06, osWaitForever);      
 #endif
-    
+        if (!read_MsgObj()) {
+            continue;
+        }
+
         printf("Read ID=%8X, Type=%s, DLC=%d,Data=",canMsg.id,canMsg.format?"EXT":"STD",canMsg.len);
         for(i=0; i<canMsg.len; i++)
             printf("%02X,",canMsg.data[i]);
