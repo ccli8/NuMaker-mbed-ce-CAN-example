@@ -21,9 +21,11 @@ CAN canObj(PA_0, PA_1);     // Internal in the board
 #elif defined(TARGET_NUMAKER_PFM_M453)
 CAN canObj(PA_13, PA_12);   // Internal in the board
 #elif defined(TARGET_NUMAKER_PFM_M487)
-CAN canObj(D9, D8);         // Change to match external attachment
+CAN canObj(D9, D8);         // (rd, td) Change to match external attachment
 #elif defined(TARGET_NUMAKER_IOT_M487) 
 CAN canObj(A0, A1);         // Change to match external attachment
+#elif defined(TARGET_NUMAKER_IOT_M467) 
+CAN canObj(PJ_11, PJ_10);         // (rd, td) Change to match external attachment
 #endif
 
 CANMessage canMsg;
