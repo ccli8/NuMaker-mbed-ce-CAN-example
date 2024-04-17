@@ -110,10 +110,10 @@ int main() {
             data[0]=0;
         else
             data[0]++;
-        
+
         memset(&data[1], data[0], 7);
-        wait(1);
-        
+        ThisThread::sleep_for(1000ms);
+
 #endif
         
 #if CAN_RX_MODE_TEST
