@@ -9,6 +9,11 @@ DigitalOut led3(LED3, 1); //LED B OFF
 
 #define CAN_TX_MODE_TEST            0
 #define CAN_RX_MODE_TEST            1
+#define CAN_LOOPBACK_MODE_TEST      0
+#if CAN_LOOPBACK_MODE_TEST && (!CAN_TX_MODE_TEST || !CAN_RX_MODE_TEST)
+#error "Either TX or RX not enabled for loopback mode"
+#endif
+
 /* WARNING: Don't enable interrupt mode on receive side. It is not supported on Nuvoton targets. */
 #define CAN_RX_IRQ_EN               0
 #define LED_ALL_OFF                 led1=led2=led3=1
@@ -105,7 +110,14 @@ int main() {
     canObj.filter(CAN_DEV_ID, 0, CANStandard, MSG_NUM_INDEX);
     
 #endif
-    
+
+#if CAN_LOOPBACK_MODE_TEST
+    if (!canObj.mode(CAN::SilentTest)) {
+        printf("CAN: Configure to SilentTest mode failed\n\n");
+        return EXIT_FAILURE;
+    }
+#endif
+
     while (true)
     {
 
