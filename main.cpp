@@ -93,7 +93,15 @@ int main() {
     /* Attach irq function */
     canObj.attach(irq_callback, CAN::RxIrq);
 #endif
-    
+
+    /* According to link below, filter #0 will accept any message, and
+     * no other filters can accept messages without re-configuring filter #0.
+     * https://os.mbed.com/questions/85183/How-to-use-CAN-filter-function
+     *
+     * Re-configure filter #0 to accept message ID 0 only.
+     */
+    canObj.filter(0, 0xFFFFFFFF);
+
     canObj.filter(CAN_DEV_ID, 0, CANStandard, MSG_NUM_INDEX);
     
 #endif
